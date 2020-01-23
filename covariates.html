@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="E Rexstad" />
+
+<meta name="date" content="2020-01-22" />
+
+<title>Covariates in the detection function</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Covariates in the detection function</h1>
+<h4 class="author">E Rexstad</h4>
+<h4 class="date">22 January 2020</h4>
+
+
+
+<p>In this problem, we illustrate fitting multiple covariate distance sampling (MCDS) models to point transect data using a bird survey from Hawaii: data on an abundant species, the Hawaii amakihi <em>(Hemignathus virens)</em> is used. This practical is makes use of the <code>Distance</code> R package described by Miller et al. <span class="citation">(2019)</span> duplicating the analysis in Marques et al. <span class="citation">(2007)</span>. For basic information regarding analysis of point transect data, consult the <a href="https://examples.distancesampling.org/Distance-points/pointtransects.html">point transect example</a></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(Distance)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw">data</span>(amakihi)</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">head</span>(amakihi, <span class="dt">n=</span><span class="dv">3</span>)</a></code></pre></div>
+<pre><code>##   Region.Label Area Sample.Label Effort object distance Month OBs   Sp MAS HAS
+## 1          792    0            1      1      1       40     0 TJS COAM  50   1
+## 2          792    0            1      1      2       60     0 TJS COAM  50   1
+## 3          792    0            1      1      3       45     0 TJS COAM  50   1
+##   Study.Area
+## 1       Kana
+## 2       Kana
+## 3       Kana</code></pre>
+<p>These data include:</p>
+<ul>
+<li><code>Region.Label</code> - survey dates (month and year, e.g. 792 is July 1992) which are used as ‘strata’</li>
+<li><code>Area</code> - study area size (not used, set to 0) will only produce density estimates, not abundance</li>
+<li><code>Sample.Label</code> - point transect identifier (41 transects)</li>
+<li><code>Effort</code> - survey effort (1 for all points because each point was visited once)</li>
+<li><code>distance</code> - radial distance of detection from observer (meters)</li>
+<li><code>month</code> -</li>
+<li><code>OBs</code> - initials of the observer</li>
+<li><code>Sp</code> - species code (COAM)</li>
+<li><code>MAS</code> - minutes after sunrise</li>
+<li><code>HAS</code> - hour after sunrise</li>
+<li><code>Study.Area</code> - name of the study area (Kana)</li>
+</ul>
+<p>Note that the <code>Area</code> column is always zero, hence, detection functions can be fitted to the data, but bird abundance cannot be estimated. The covariates to be considered for possible inclusion into the detection function are <code>OBs</code>, <code>MAS</code> and <code>HAS</code>.</p>
+<div id="exploratory-data-analysis" class="section level1">
+<h1>Exploratory data analysis</h1>
+<p>It is important to gain an understanding of the data prior to fitting detection functions. With this in mind, preliminary analysis of distance sampling data involves:</p>
+<ul>
+<li>assessing the shape of the collected data,</li>
+<li>considering the level of truncation of distances, and</li>
+<li>exploring patterns in potential covariates.</li>
+</ul>
+<p>We begin by assessing the distribution of distances to decide on a truncation distance.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">hist</span>(amakihi<span class="op">$</span>distance, <span class="dt">main=</span><span class="st">&quot;Radial distances&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;Distance (m)&quot;</span>)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>To see if there are differences in the distribution of distances recorded by the different observers and in each hour after sunrise, boxplots can be used. Note how the <code>~</code> symbol is used to define the discrete groupings (i.e. observer and hour).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">boxplot</span>(amakihi<span class="op">$</span>distance<span class="op">~</span>amakihi<span class="op">$</span>OBs, <span class="dt">xlab=</span><span class="st">&quot;Observer&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Distance (m)&quot;</span>)</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="kw">boxplot</span>(amakihi<span class="op">$</span>distance<span class="op">~</span>amakihi<span class="op">$</span>HAS, <span class="dt">xlab=</span><span class="st">&quot;Hour&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Distance (m)&quot;</span>)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><img src="data:image/png;base64,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" /></p>
+<p>The components of the boxplot are:</p>
+<ul>
+<li>the thick black line indicates the median</li>
+<li>the lower limit of the box is the first quartile (25th percentile) and the upper limit is the third quartile (75th percentile)</li>
+<li>the height of the box is the interquartile range (75th - 25th quartiles)</li>
+<li>the whiskers extend to the most extreme points which are no more than 1.5 times the interquartile range.</li>
+<li>dots indicate ‘outliers’ if there are any, i.e. points beyond the range of the whiskers.</li>
+</ul>
+<p>For minutes after sunrise (a continuous variable), we create a scatterplot of MAS (on the <span class="math inline">\(x\)</span>-axis) against distances (on the <span class="math inline">\(y\)</span>-axis). The plotting symbol (or character) is selected with the argument <code>pch</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">scatter.smooth</span>(amakihi<span class="op">$</span>MAS, amakihi<span class="op">$</span>distance, <span class="dt">family =</span> <span class="st">&quot;gaussian&quot;</span>, <span class="dt">pch=</span><span class="st">&#39;.&#39;</span>, <span class="dt">lpars=</span><span class="kw">list</span>(<span class="dt">lwd=</span><span class="dv">3</span>),</a>
+<a class="sourceLine" id="cb5-2" title="2">               <span class="dt">xlab=</span><span class="st">&quot;Minutes after sunrise&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;Distance (m)&quot;</span>)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Clearly room for right truncation from this figure of the radial distance distribution. Subsequent detection function fitting will use the <code>truncation</code> argument in <code>ds()</code> to exclude the largest 15% of the detection distances.</p>
+<p>You may also want to think about potential collinearity (linear relationship) between the covariates - if collinear variables are included in the detection function, they will be explaining some of the same variation in the distances and this will reduce their importance as a potential covariate. How might you investigate the relationship between <code>HAS</code> and <code>MAS</code>?</p>
+<p>From these plots, infer whether any of the covariates will be useful in explaining the distribution of detection distances.</p>
+</div>
+<div id="adjusting-the-raw-covariates" class="section level1">
+<h1>Adjusting the raw covariates</h1>
+<p>We would like to treat <code>OBs</code> and <code>HAS</code> as factor variables as in the original analysis; <code>OBs</code> is, by default, treated as a factor variable because it consists of characters rather than numbers. <code>HAS</code>, on the other hand, consists of numbers and so by default would be treated as a continuous variable (i.e. non-factor). That is fine if we want the effect of <code>HAS</code> to be monotonic (i.e. detectability either increases or decreases as a function of <code>HAS</code>). If we want <code>HAS</code> to have a non-linear effect on detectability, then we need to indicate to <code>R</code> to treat it as a factor as shown below.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">amakihi<span class="op">$</span>HAS &lt;-<span class="st"> </span><span class="kw">factor</span>(amakihi<span class="op">$</span>HAS)</a></code></pre></div>
+<p>One other, more subtle adjustment, is a transformation of the continuous covariate <code>MAS</code>. We are considering three possible covariates in our detection function: <code>OBs</code>, <code>HAS</code> and <code>MAS</code>. The first two variables, <code>OBs</code> and <code>HAS</code>, are both factor variables, and so, essentially, we can think of them as taking on values between 1 and 3 in the case of <code>OBS</code>, and 1 to 6 in the case of <code>HAS</code>. However, <code>MAS</code> can take on values from -18 (detections before sunrise) to &gt;300 and the disparity in scales of measure between <code>MAS</code> and the other candidate covariates can lead to difficulties in the performance of the optimizer fitting the detection functions in R. The solution to the difficulty is to scale <code>MAS</code> such that it is on a scale (approx. 1 to 5) comparable with the other covariates.</p>
+<p>Scaling the continuous covariate <code>MAS</code> makes optimisation to estiamte parameters of the detection function simpler.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">amakihi<span class="op">$</span>MAS &lt;-<span class="st"> </span><span class="kw">scale</span>(amakihi<span class="op">$</span>MAS)</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="kw">summary</span>(amakihi<span class="op">$</span>MAS)</a></code></pre></div>
+<pre><code>##        V1          
+##  Min.   :-2.08724  
+##  1st Qu.:-0.82597  
+##  Median :-0.05081  
+##  Mean   : 0.00000  
+##  3rd Qu.: 0.76376  
+##  Max.   : 2.18270  
+##  NA&#39;s   :2</code></pre>
+</div>
+<div id="candidate-models" class="section level1">
+<h1>Candidate models</h1>
+<p>With three potential covariates, there are 8 possible models for the detection function:</p>
+<ul>
+<li>No covariates</li>
+<li>OBs</li>
+<li>HAS</li>
+<li>MAS</li>
+<li>OBs + HAS</li>
+<li>OBs + MAS</li>
+<li>HAS + MAS</li>
+<li>OBs + HAS + MAS</li>
+</ul>
+<p>Even without considering covariates there are also several possible key function/adjustment term combinations available: if all key function/covariate combinations are considered the number of potential models is large. Note that covariates are not allowed if a uniform key function is chosen and if covariate terms are included, adjustment terms are not allowed. Even with these restrictions, it is not best practice to take a scatter gun approach to detection function model fitting. Buckland et al. <span class="citation">(2015)</span> considered 13 combinations of key function/covariates. Here, we look at a subset of these.</p>
+<p>Fit a hazard rate model with no covariates or adjustment terms and make a note of the AIC. Note, that 15% of the largest distances are truncated - you may have decided on a different truncation distance.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">conversion.factor &lt;-<span class="st"> </span><span class="kw">convert_units</span>(<span class="st">&quot;meter&quot;</span>, <span class="ot">NULL</span>, <span class="st">&quot;hectare&quot;</span>)</a>
+<a class="sourceLine" id="cb9-2" title="2">amak.hr &lt;-<span class="st"> </span><span class="kw">ds</span>(amakihi, <span class="dt">transect=</span><span class="st">&quot;point&quot;</span>, <span class="dt">key=</span><span class="st">&quot;hr&quot;</span>, <span class="dt">truncation=</span><span class="st">&quot;15%&quot;</span>,</a>
+<a class="sourceLine" id="cb9-3" title="3">              <span class="dt">adjustment=</span><span class="ot">NULL</span>, <span class="dt">convert.units =</span> conversion.factor)</a></code></pre></div>
+<p>Now fit a hazard rate model with <code>OBs</code> as a covariate in the detection function and make a note of the AIC. Has the AIC reduced by including a covariate?</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">amak.hr.obs &lt;-<span class="st"> </span><span class="kw">ds</span>(amakihi, <span class="dt">transect=</span><span class="st">&quot;point&quot;</span>, <span class="dt">key=</span><span class="st">&quot;hr&quot;</span>, <span class="dt">formula=</span><span class="op">~</span>OBs,</a>
+<a class="sourceLine" id="cb10-2" title="2">                  <span class="dt">truncation=</span><span class="st">&quot;15%&quot;</span>, <span class="dt">convert.units =</span> conversion.factor)</a></code></pre></div>
+<p>Fit a hazard rate model with <code>OBs</code> and <code>HAS</code> in the detection function:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">amak.hr.obs.has &lt;-<span class="st"> </span><span class="kw">ds</span>(amakihi, <span class="dt">transect=</span><span class="st">&quot;point&quot;</span>, <span class="dt">key=</span><span class="st">&quot;hr&quot;</span>, <span class="dt">formula=</span><span class="op">~</span>OBs<span class="op">+</span>HAS,</a>
+<a class="sourceLine" id="cb11-2" title="2">                      <span class="dt">truncation=</span><span class="st">&quot;15%&quot;</span>, <span class="dt">convert.units =</span> conversion.factor)</a></code></pre></div>
+<p>Try fitting other possible formula and decide which model is best in terms of AIC. To quickly compare AIC values from different models, use the <code>AIC</code> command as follows (note only models with the same truncation distance can be compared):</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">AIC</span>(amak.hr, amak.hr.obs, amak.hr.obs.has)</a></code></pre></div>
+<pre><code>##                 df      AIC
+## amak.hr          2 11400.47
+## amak.hr.obs      4 11368.20
+## amak.hr.obs.has  9 11372.41</code></pre>
+<p>Another useful function is <code>summarize_ds_models</code> - this has the advantage of ordering the models by AIC (smallest to largest).</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">summarize_ds_models</span>(amak.hr, amak.hr.obs, amak.hr.obs.has), <span class="dt">digits=</span><span class="dv">3</span>)</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="left">Model</th>
+<th align="left">Key function</th>
+<th align="left">Formula</th>
+<th align="right">C-vM p-value</th>
+<th align="right"><span class="math inline">\(\hat{P_a}\)</span></th>
+<th align="right">se(<span class="math inline">\(\hat{P_a}\)</span>)</th>
+<th align="right"><span class="math inline">\(\Delta\)</span>AIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td align="left"></td>
+<td align="left">Hazard-rate</td>
+<td align="left">~OBs</td>
+<td align="right">0.116</td>
+<td align="right">0.297</td>
+<td align="right">0.022</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td align="left"></td>
+<td align="left">Hazard-rate</td>
+<td align="left">~OBs + HAS</td>
+<td align="right">0.198</td>
+<td align="right">0.303</td>
+<td align="right">0.022</td>
+<td align="right">4.204</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td align="left"></td>
+<td align="left">Hazard-rate</td>
+<td align="left">~1</td>
+<td align="right">0.144</td>
+<td align="right">0.308</td>
+<td align="right">0.022</td>
+<td align="right">32.268</td>
+</tr>
+</tbody>
+</table>
+<p>Examine the shape of the preferred detection function (including covariates observer and hours after sunrise) by plotting</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">plot</span>(amak.hr.obs.has, <span class="dt">pdf=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="comments-about-the-chosen-model" class="section level1">
+<h1>Comments about the chosen model</h1>
+<p>There were three observers involved in the survey. One observer made ~80% of the detections, with a second observer responsible for a further 15% and the third observer 5%. There are six unique values of <code>HAS</code>. The detection function of the observer with the majority of the detections can be seen clearly as the rows of detections beyond 40m above the solid line. If you look closely, you can see six circles representing each of the hours after sunrise. This observer’s PDF is above the PDF of the other two observers. Their PDF peaks at ~20m and rapidly diminishes thereafter, whereas the PDF of the observer with the most detections peaks at ~35m and declines more slowly thereafter.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-buckland2015distance">
+<p>Buckland, S., Rexstad, E., Marques, T., &amp; Oedekoven, C. (2015). <em>Distance sampling: Methods and applications</em>. Springer.</p>
+</div>
+<div id="ref-Maretal07">
+<p>Marques, T. A., Thomas, L., Fancy, S. G., &amp; Buckland, S. T. (2007). Improving estimates of bird density using multiple covariate distance sampling. <em>The Auk</em>, <em>124</em>, 1229–1243. <a href="https://doi.org/10.1642/0004-8038(2007)124%5B1229:IEOBDU%5D2.0.CO;2">https://doi.org/10.1642/0004-8038(2007)124[1229:IEOBDU]2.0.CO;2</a></p>
+</div>
+<div id="ref-miller_distance_2019">
+<p>Miller, D. L., Rexstad, E., Thomas, L., Marshall, L., &amp; Laake, J. L. (2019). Distance Sampling in R. <em>Journal of Statistical Software</em>, <em>89</em>(1), 1–28. <a href="https://doi.org/10.18637/jss.v089.i01">https://doi.org/10.18637/jss.v089.i01</a></p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
