@@ -123,21 +123,21 @@ Fit a hazard rate model with no covariates or adjustment terms and make a note o
 ```{r}
 conversion.factor <- convert_units("meter", NULL, "hectare")
 amak.hr <- ds(amakihi, transect="point", key="hr", truncation="15%",
-              adjustment=NULL, convert.units = conversion.factor)
+              adjustment=NULL, convert_units = conversion.factor)
 ```
 
 Now fit a hazard rate model with `OBs` as a covariate in the detection function and make a note of the AIC. Has the AIC reduced by including a covariate? 
 
 ```{r}
 amak.hr.obs <- ds(amakihi, transect="point", key="hr", formula=~OBs,
-                  truncation="15%", convert.units = conversion.factor)
+                  truncation="15%", convert_units = conversion.factor)
 ```
 
 Fit a hazard rate model with `OBs` and `MAS` in the detection function:
 
 ```{r}
 amak.hr.obs.mas <- ds(amakihi, transect="point", key="hr", formula=~OBs+MAS,
-                      truncation="15%", convert.units = conversion.factor)
+                      truncation="15%", convert_units = conversion.factor)
 ```
 
 Try fitting other possible formula and decide which model is best in terms of AIC. To quickly compare AIC values from different models, use the `AIC` command as follows (note only models with the same truncation distance can be compared):
